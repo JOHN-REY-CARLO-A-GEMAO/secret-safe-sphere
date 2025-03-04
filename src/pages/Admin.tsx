@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Navbar } from '@/components/Navbar';
@@ -9,39 +9,56 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, BarChart2, Shield, Settings, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const AdminDashboard = () => {
   const { authState } = useAuth();
   const navigate = useNavigate();
   const { user, profile, isLoading } = authState;
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!isLoading && (!user || profile?.role !== 'admin')) {
-      toast({
-        title: "Access Denied",
-        description: "You don't have permission to view this page.",
-        variant: "destructive",
-      });
-      navigate('/');
+    if (!isLoading) {
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "You need to sign in to access this page.",
+          variant: "destructive",
+        });
+        navigate('/auth');
+        return;
+      }
+
+      if (profile?.role !== 'admin') {
+        toast({
+          title: "Access Denied",
+          description: "You don't have permission to view this page.",
+          variant: "destructive",
+        });
+        navigate('/');
+        return;
+      }
+
+      setIsAuthorized(true);
     }
   }, [user, profile, isLoading, navigate]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
-  if (!user || profile?.role !== 'admin') {
+  if (isAuthorized === null) {
+    return <LoadingState />;
+  }
+
+  if (!isAuthorized) {
     return null;
   }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar />
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 mt-16">
         <div className="mb-8">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
           <p className="text-gray-500">Manage your Whisperspace community</p>
@@ -122,6 +139,51 @@ const AdminDashboard = () => {
             </Card>
           </TabsContent>
         </Tabs>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+// Loading state component
+const LoadingState = () => {
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Navbar />
+      <main className="flex-1 container mx-auto px-4 py-8 mt-16">
+        <div className="mb-8">
+          <Skeleton className="h-10 w-3/12 mb-2" />
+          <Skeleton className="h-5 w-4/12" />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          {[1, 2, 3, 4].map(i => (
+            <Card key={i} className="p-6">
+              <div className="flex items-center">
+                <Skeleton className="h-10 w-10 rounded-lg mr-4" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-6 w-10" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        <Skeleton className="h-10 w-[400px] mb-6" />
+        
+        <Card className="p-6">
+          <Skeleton className="h-7 w-1/4 mb-4" />
+          <Skeleton className="h-4 w-2/4 mb-8" />
+          <div className="bg-gray-100 rounded-lg p-12 flex items-center justify-center">
+            <div className="space-y-4 w-full max-w-xs">
+              <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+              <Skeleton className="h-6 w-1/2 mx-auto" />
+              <Skeleton className="h-4 w-3/4 mx-auto" />
+              <Skeleton className="h-9 w-32 mx-auto" />
+            </div>
+          </div>
+        </Card>
       </main>
       <Footer />
     </div>
