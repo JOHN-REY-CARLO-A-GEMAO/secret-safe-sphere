@@ -1,7 +1,9 @@
-
 import { useState, useEffect } from 'react';
-import { Shield, Menu, X } from 'lucide-react';
+import { Shield, Menu, X, LogIn } from 'lucide-react';
 import { SlideIn } from './Animations';
+import { useAuth } from '@/contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { Button } from './ui/button';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -15,6 +17,9 @@ export const Navbar = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const { authState, signOut } = useAuth();
+  const { user, profile } = authState;
 
   return (
     <header
@@ -40,6 +45,28 @@ export const Navbar = () => {
               </a>
             </SlideIn>
           ))}
+          
+          {user ? (
+            <SlideIn delay={500}>
+              <div className="flex items-center space-x-4">
+                {profile?.role === 'admin' && (
+                  <span className="text-sm font-medium text-primary">Admin</span>
+                )}
+                <Button variant="outline" onClick={signOut}>
+                  Sign out
+                </Button>
+              </div>
+            </SlideIn>
+          ) : (
+            <SlideIn delay={500}>
+              <Link to="/auth">
+                <Button>
+                  <LogIn className="w-4 h-4 mr-2" />
+                  Sign in
+                </Button>
+              </Link>
+            </SlideIn>
+          )}
         </nav>
 
         {/* Mobile Menu Button */}
@@ -64,6 +91,26 @@ export const Navbar = () => {
                   {item}
                 </a>
               ))}
+              
+              {user ? (
+                <div className="pt-2 border-t border-gray-100">
+                  {profile?.role === 'admin' && (
+                    <span className="block text-sm font-medium text-primary mb-2">
+                      Admin
+                    </span>
+                  )}
+                  <Button variant="outline" onClick={signOut} className="w-full">
+                    Sign out
+                  </Button>
+                </div>
+              ) : (
+                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                  <Button className="w-full">
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Sign in
+                  </Button>
+                </Link>
+              )}
             </nav>
           </div>
         )}
