@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,12 +9,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, BarChart2, Shield, Settings, AlertCircle } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useAdminStats } from '@/hooks/use-admin-stats';
 
 const AdminDashboard = () => {
   const { authState } = useAuth();
   const navigate = useNavigate();
   const { user, profile, isLoading } = authState;
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
+  const adminStats = useAdminStats();
 
   useEffect(() => {
     if (!isLoading) {
@@ -43,7 +44,7 @@ const AdminDashboard = () => {
     }
   }, [user, profile, isLoading, navigate]);
 
-  if (isLoading) {
+  if (isLoading || adminStats.isLoading) {
     return <LoadingState />;
   }
 
@@ -65,10 +66,26 @@ const AdminDashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <StatsCard icon={<Users size={24} />} title="Total Users" value="--" />
-          <StatsCard icon={<Shield size={24} />} title="Total Confessions" value="--" />
-          <StatsCard icon={<AlertCircle size={24} />} title="Reported Content" value="--" />
-          <StatsCard icon={<BarChart2 size={24} />} title="Active Users" value="--" />
+          <StatsCard 
+            icon={<Users size={24} />} 
+            title="Total Users" 
+            value={adminStats.totalUsers.toString()} 
+          />
+          <StatsCard 
+            icon={<Shield size={24} />} 
+            title="Total Confessions" 
+            value={adminStats.totalConfessions.toString()} 
+          />
+          <StatsCard 
+            icon={<AlertCircle size={24} />} 
+            title="Reported Content" 
+            value={adminStats.reportedContent.toString()} 
+          />
+          <StatsCard 
+            icon={<BarChart2 size={24} />} 
+            title="Active Users" 
+            value={adminStats.activeUsers.toString()} 
+          />
         </div>
 
         <Tabs defaultValue="users">
@@ -145,7 +162,6 @@ const AdminDashboard = () => {
   );
 };
 
-// Loading state component
 const LoadingState = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -190,7 +206,6 @@ const LoadingState = () => {
   );
 };
 
-// Stats Card Component
 const StatsCard = ({ icon, title, value }: { icon: React.ReactNode, title: string, value: string }) => {
   return (
     <Card className="p-6">
