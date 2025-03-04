@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Navbar } from '@/components/Navbar';
@@ -12,7 +11,7 @@ import {
   Eye,
   Heart,
   Laugh,
-  HandsClapping,
+  Hand,
   Frown,
   Lightbulb,
   Send
@@ -32,7 +31,6 @@ const ConfessionDetails = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   useEffect(() => {
-    // In a real app, this would fetch from an API
     const confessionsFromLocalStorage = localStorage.getItem('confessions');
     const confessions = confessionsFromLocalStorage 
       ? JSON.parse(confessionsFromLocalStorage) as Confession[] 
@@ -41,7 +39,6 @@ const ConfessionDetails = () => {
     const foundConfession = confessions.find(c => c.id === id);
     
     if (foundConfession) {
-      // Add default reactions if they don't exist
       if (!foundConfession.reactions) {
         foundConfession.reactions = {
           relate: { type: 'relate', count: 0 },
@@ -52,18 +49,13 @@ const ConfessionDetails = () => {
         };
       }
       
-      // Add default comments array if it doesn't exist
       if (!foundConfession.comments) {
         foundConfession.comments = [];
       }
       
-      // Mark as read
       foundConfession.hasBeenRead = true;
-      
-      // Increment view count
       foundConfession.viewCount = (foundConfession.viewCount || 0) + 1;
       
-      // Update localStorage
       localStorage.setItem('confessions', JSON.stringify(confessions));
       
       setConfession(foundConfession);
@@ -71,7 +63,6 @@ const ConfessionDetails = () => {
     
     setLoading(false);
     
-    // Handle self-destruct logic in a real app
     if (foundConfession?.visibility === 'self-destruct' && foundConfession.hasBeenRead) {
       const timer = setTimeout(() => {
         const updatedConfessions = confessions.filter(c => c.id !== id);
@@ -84,7 +75,7 @@ const ConfessionDetails = () => {
         });
         
         navigate('/');
-      }, 30000); // 30 seconds for demo purposes
+      }, 30000);
       
       return () => clearTimeout(timer);
     }
@@ -95,7 +86,6 @@ const ConfessionDetails = () => {
     
     setIsSubmitting(true);
     
-    // Create new comment
     const comment: Comment = {
       id: Math.random().toString(36).substring(2, 15),
       content: newComment.trim(),
@@ -103,13 +93,11 @@ const ConfessionDetails = () => {
       privacyLevel: 'anonymous'
     };
     
-    // Get confessions from localStorage
     const confessionsFromLocalStorage = localStorage.getItem('confessions');
     const confessions = confessionsFromLocalStorage 
       ? JSON.parse(confessionsFromLocalStorage) as Confession[] 
       : [];
     
-    // Find and update the confession
     const updatedConfessions = confessions.map(c => {
       if (c.id === confession.id) {
         return {
@@ -120,16 +108,13 @@ const ConfessionDetails = () => {
       return c;
     });
     
-    // Update localStorage
     localStorage.setItem('confessions', JSON.stringify(updatedConfessions));
     
-    // Update state
     setConfession({
       ...confession,
       comments: [...(confession.comments || []), comment]
     });
     
-    // Reset form
     setNewComment('');
     setIsSubmitting(false);
     
@@ -142,13 +127,11 @@ const ConfessionDetails = () => {
   const handleReaction = (type: ReactionType) => {
     if (!confession || !confession.reactions) return;
     
-    // Get confessions from localStorage
     const confessionsFromLocalStorage = localStorage.getItem('confessions');
     const confessions = confessionsFromLocalStorage 
       ? JSON.parse(confessionsFromLocalStorage) as Confession[] 
       : [];
     
-    // Toggle the reaction
     const currentReaction = confession.reactions[type];
     const wasReacted = currentReaction.reacted;
     
@@ -158,7 +141,6 @@ const ConfessionDetails = () => {
       reacted: !wasReacted
     };
     
-    // Create updated confession object
     const updatedConfession = {
       ...confession,
       reactions: {
@@ -167,14 +149,12 @@ const ConfessionDetails = () => {
       }
     };
     
-    // Update in localStorage
     const updatedConfessions = confessions.map(c => 
       c.id === confession.id ? updatedConfession : c
     );
     
     localStorage.setItem('confessions', JSON.stringify(updatedConfessions));
     
-    // Update state
     setConfession(updatedConfession);
   };
   
@@ -212,7 +192,6 @@ const ConfessionDetails = () => {
     );
   }
 
-  // Format the creation time
   const timeAgo = formatDistanceToNow(new Date(confession.createdAt), { addSuffix: true });
   
   return (
@@ -231,7 +210,6 @@ const ConfessionDetails = () => {
           
           <SlideUp className="bg-white border border-gray-100 rounded-2xl overflow-hidden shadow-md">
             <div className="p-6 md:p-8">
-              {/* Header */}
               <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center space-x-2">
                   {confession.privacyLevel === 'throwaway' && confession.throwawayName ? (
@@ -258,14 +236,12 @@ const ConfessionDetails = () => {
                 </div>
               </div>
               
-              {/* Content */}
               <div className="mb-6">
                 <p className="text-gray-800 text-lg leading-relaxed whitespace-pre-line">
                   {confession.content}
                 </p>
               </div>
               
-              {/* Tags */}
               <div className="flex flex-wrap gap-1.5 mb-6">
                 <CategoryTag category={confession.category} />
                 {confession.emotionTags.map((tag) => (
@@ -273,7 +249,6 @@ const ConfessionDetails = () => {
                 ))}
               </div>
               
-              {/* Reactions */}
               <div className="flex flex-wrap gap-2 py-4 border-t border-gray-100">
                 <ReactionButton 
                   icon={<Heart size={16} />}
@@ -284,7 +259,7 @@ const ConfessionDetails = () => {
                 />
                 
                 <ReactionButton 
-                  icon={<HandsClapping size={16} />}
+                  icon={<Hand size={16} />}
                   label="Support"
                   count={confession.reactions?.support.count || 0}
                   active={confession.reactions?.support.reacted || false}
@@ -318,13 +293,11 @@ const ConfessionDetails = () => {
             </div>
           </SlideUp>
           
-          {/* Comments Section */}
           <FadeIn className="mt-10">
             <h2 className="text-2xl font-display font-semibold mb-6">
               Comments
             </h2>
             
-            {/* Comment Form */}
             <div className="bg-white border border-gray-100 rounded-2xl p-4 mb-6 shadow-sm">
               <div className="flex space-x-3">
                 <div className="flex-grow">
@@ -360,7 +333,6 @@ const ConfessionDetails = () => {
               </div>
             </div>
             
-            {/* Comments List */}
             <CommentsList comments={confession.comments || []} />
           </FadeIn>
         </div>
