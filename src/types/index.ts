@@ -26,6 +26,22 @@ export type EmotionTag =
   | 'proud' 
   | 'grateful';
 
+export type ReactionType = 'relate' | 'support' | 'hug' | 'shocked' | 'insightful';
+
+export interface Reaction {
+  type: ReactionType;
+  count: number;
+  reacted?: boolean; // to track if current session has reacted
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: Date;
+  privacyLevel: PrivacyLevel;
+  throwawayName?: string;
+}
+
 export interface Confession {
   id: string;
   content: string;
@@ -37,4 +53,7 @@ export interface Confession {
   timeLimit?: Date;
   emotionTags: EmotionTag[];
   hasBeenRead?: boolean;
+  reactions?: Record<ReactionType, Reaction>;
+  comments?: Comment[];
+  viewCount?: number;
 }

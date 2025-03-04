@@ -1,9 +1,10 @@
 
 import { useState } from 'react';
-import { Flag, Eye, Clock, Trash, Calendar } from 'lucide-react';
+import { Flag, Eye, Clock, Trash, Calendar, MessageCircle } from 'lucide-react';
 import { Confession } from '@/types';
 import { CategoryTag } from './ui/CategoryTag';
 import { formatDistanceToNow } from 'date-fns';
+import { Link } from 'react-router-dom';
 
 interface ConfessionCardProps {
   confession: Confession;
@@ -15,7 +16,7 @@ export const ConfessionCard = ({ confession, onDelete }: ConfessionCardProps) =>
   const [isRead, setIsRead] = useState(confession.hasBeenRead || false);
   
   // Format the creation time
-  const timeAgo = formatDistanceToNow(confession.createdAt, { addSuffix: true });
+  const timeAgo = formatDistanceToNow(new Date(confession.createdAt), { addSuffix: true });
 
   // Self-destruct feature (in a real app, you would handle this on the server)
   const handleRead = () => {
@@ -28,12 +29,15 @@ export const ConfessionCard = ({ confession, onDelete }: ConfessionCardProps) =>
     }
   };
 
+  // Count the comments
+  const commentCount = confession.comments?.length || 0;
+
   return (
     <div 
       className="bg-white backdrop-blur-sm border border-gray-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300"
       onClick={handleRead}
     >
-      <div className="p-5">
+      <Link to={`/confession/${confession.id}`} className="block p-5">
         {/* Header with privacy level and time */}
         <div className="flex justify-between items-center mb-4">
           <div className="flex items-center space-x-2">
@@ -68,24 +72,33 @@ export const ConfessionCard = ({ confession, onDelete }: ConfessionCardProps) =>
         
         {/* Footer with visibility and actions */}
         <div className="flex justify-between items-center border-t border-gray-100 pt-3 mt-3">
-          <div className="flex items-center space-x-1.5 text-gray-500 text-xs">
-            {confession.visibility === 'public' && (
-              <>
-                <Eye className="w-3.5 h-3.5" />
-                <span>Public</span>
-              </>
-            )}
-            {confession.visibility === 'time-limited' && (
-              <>
-                <Clock className="w-3.5 h-3.5" />
-                <span>Time-limited</span>
-              </>
-            )}
-            {confession.visibility === 'self-destruct' && (
-              <>
-                <Trash className="w-3.5 h-3.5" />
-                <span>Self-destruct{isRead ? ' (read)' : ''}</span>
-              </>
+          <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-1.5 text-gray-500 text-xs">
+              {confession.visibility === 'public' && (
+                <>
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Public</span>
+                </>
+              )}
+              {confession.visibility === 'time-limited' && (
+                <>
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>Time-limited</span>
+                </>
+              )}
+              {confession.visibility === 'self-destruct' && (
+                <>
+                  <Trash className="w-3.5 h-3.5" />
+                  <span>Self-destruct{isRead ? ' (read)' : ''}</span>
+                </>
+              )}
+            </div>
+            
+            {commentCount > 0 && (
+              <div className="flex items-center space-x-1 text-gray-500 text-xs">
+                <MessageCircle className="w-3.5 h-3.5" />
+                <span>{commentCount}</span>
+              </div>
             )}
           </div>
           
@@ -94,6 +107,7 @@ export const ConfessionCard = ({ confession, onDelete }: ConfessionCardProps) =>
               reported ? 'text-red-500' : 'text-gray-400 hover:text-gray-600'
             }`}
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               setReported(true);
             }}
@@ -103,7 +117,7 @@ export const ConfessionCard = ({ confession, onDelete }: ConfessionCardProps) =>
             <span>{reported ? 'Reported' : 'Report'}</span>
           </button>
         </div>
-      </div>
+      </Link>
     </div>
   );
 };

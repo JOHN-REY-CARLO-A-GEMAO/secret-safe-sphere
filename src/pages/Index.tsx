@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Navbar } from '@/components/Navbar';
 import { ConfessionForm } from '@/components/ConfessionForm';
 import { ConfessionCard } from '@/components/ConfessionCard';
@@ -13,9 +13,25 @@ const Index = () => {
   const [confessions, setConfessions] = useState<Confession[]>([]);
   const [showConfirmation, setShowConfirmation] = useState(false);
 
+  // Load confessions from localStorage on component mount
+  useEffect(() => {
+    const savedConfessions = localStorage.getItem('confessions');
+    if (savedConfessions) {
+      try {
+        setConfessions(JSON.parse(savedConfessions));
+      } catch (error) {
+        console.error('Error parsing confessions from localStorage:', error);
+      }
+    }
+  }, []);
+
   const handleSubmitConfession = (confession: Confession) => {
-    setConfessions([confession, ...confessions]);
+    const updatedConfessions = [confession, ...confessions];
+    setConfessions(updatedConfessions);
     setShowConfirmation(true);
+    
+    // Save to localStorage
+    localStorage.setItem('confessions', JSON.stringify(updatedConfessions));
     
     // Hide confirmation after a delay
     setTimeout(() => {
@@ -24,7 +40,11 @@ const Index = () => {
   };
 
   const handleDeleteConfession = (id: string) => {
-    setConfessions(confessions.filter(confession => confession.id !== id));
+    const updatedConfessions = confessions.filter(confession => confession.id !== id);
+    setConfessions(updatedConfessions);
+    
+    // Update localStorage
+    localStorage.setItem('confessions', JSON.stringify(updatedConfessions));
   };
 
   return (
