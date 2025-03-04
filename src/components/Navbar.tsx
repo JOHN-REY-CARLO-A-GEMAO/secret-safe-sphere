@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { Shield, Menu, X, LogIn } from 'lucide-react';
+import { Shield, Menu, X, LogIn, LayoutDashboard } from 'lucide-react';
 import { SlideIn } from './Animations';
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'react-router-dom';
@@ -50,7 +51,15 @@ export const Navbar = () => {
             <SlideIn delay={500}>
               <div className="flex items-center space-x-4">
                 {profile?.role === 'admin' && (
-                  <span className="text-sm font-medium text-primary">Admin</span>
+                  <>
+                    <span className="text-sm font-medium text-primary">Admin</span>
+                    <Link to="/admin">
+                      <Button variant="outline" size="sm">
+                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </Button>
+                    </Link>
+                  </>
                 )}
                 <Button variant="outline" onClick={signOut}>
                   Sign out
@@ -95,9 +104,17 @@ export const Navbar = () => {
               {user ? (
                 <div className="pt-2 border-t border-gray-100">
                   {profile?.role === 'admin' && (
-                    <span className="block text-sm font-medium text-primary mb-2">
-                      Admin
-                    </span>
+                    <>
+                      <span className="block text-sm font-medium text-primary mb-2">
+                        Admin
+                      </span>
+                      <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                        <Button variant="outline" className="w-full mb-2">
+                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Button>
+                      </Link>
+                    </>
                   )}
                   <Button variant="outline" onClick={signOut} className="w-full">
                     Sign out
