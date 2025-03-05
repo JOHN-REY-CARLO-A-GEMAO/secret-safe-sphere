@@ -7,11 +7,13 @@ import { Confession } from '@/types';
 import { ConfessionItem } from '../ConfessionItem';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useToast } from '@/hooks/use-toast';
 
 export const ConfessionsTab = () => {
   const [confessions, setConfessions] = useState<Confession[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const { toast } = useToast();
 
   const fetchConfessions = () => {
     setIsLoading(true);
@@ -23,12 +25,19 @@ export const ConfessionsTab = () => {
       if (savedConfessions) {
         const parsedConfessions = JSON.parse(savedConfessions);
         setConfessions(parsedConfessions);
+        console.log('Fetched confessions:', parsedConfessions);
       } else {
         setConfessions([]);
+        console.log('No confessions found in localStorage');
       }
     } catch (err) {
       console.error('Error fetching confessions:', err);
       setError(err instanceof Error ? err : new Error('Failed to load confessions'));
+      toast({
+        title: "Error loading confessions",
+        description: "There was a problem loading the confessions data.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -37,6 +46,30 @@ export const ConfessionsTab = () => {
   useEffect(() => {
     fetchConfessions();
   }, []);
+
+  const handleDeleteConfession = (id: string) => {
+    try {
+      // Remove the confession from the state
+      const updatedConfessions = confessions.filter(confession => confession.id !== id);
+      setConfessions(updatedConfessions);
+      
+      // Update localStorage
+      localStorage.setItem('confessions', JSON.stringify(updatedConfessions));
+      
+      toast({
+        title: "Confession deleted",
+        description: "The confession has been removed successfully.",
+        variant: "default"
+      });
+    } catch (err) {
+      console.error('Error deleting confession:', err);
+      toast({
+        title: "Error deleting confession",
+        description: "There was a problem removing the confession.",
+        variant: "destructive"
+      });
+    }
+  };
 
   return (
     <Card className="p-6">
@@ -75,6 +108,7 @@ export const ConfessionsTab = () => {
             <ConfessionItem 
               key={confession.id} 
               confession={confession} 
+              onDelete={handleDeleteConfession}
             />
           ))}
         </div>

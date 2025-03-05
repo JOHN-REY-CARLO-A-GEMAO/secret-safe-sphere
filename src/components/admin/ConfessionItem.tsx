@@ -5,12 +5,27 @@ import { Calendar, User, Flag, Eye, Clock, Trash } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { CategoryTag } from '@/components/ui/CategoryTag';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface ConfessionItemProps {
   confession: Confession;
+  onDelete?: (id: string) => void;
 }
 
-export const ConfessionItem = ({ confession }: ConfessionItemProps) => {
+export const ConfessionItem = ({ confession, onDelete }: ConfessionItemProps) => {
+  const { toast } = useToast();
+  
   // Format the creation time
   const timeAgo = formatDistanceToNow(new Date(confession.createdAt), { addSuffix: true });
   
@@ -29,6 +44,20 @@ export const ConfessionItem = ({ confession }: ConfessionItemProps) => {
   };
   
   const visibilityInfo = getVisibilityInfo();
+  
+  const handleReportAction = () => {
+    toast({
+      title: "Confession reported",
+      description: "This confession has been flagged for review.",
+      variant: "default"
+    });
+  };
+  
+  const handleDeleteAction = () => {
+    if (onDelete) {
+      onDelete(confession.id);
+    }
+  };
   
   return (
     <div className="border border-gray-200 rounded-lg p-4 bg-white hover:shadow-sm transition-shadow">
@@ -67,18 +96,38 @@ export const ConfessionItem = ({ confession }: ConfessionItemProps) => {
             variant="outline" 
             size="sm" 
             className="text-yellow-600 border-yellow-200 hover:bg-yellow-50"
+            onClick={handleReportAction}
           >
             <Flag className="h-4 w-4 mr-1" />
             Report
           </Button>
-          <Button 
-            variant="outline" 
-            size="sm"
-            className="text-red-600 border-red-200 hover:bg-red-50"
-          >
-            <Trash className="h-4 w-4 mr-1" />
-            Delete
-          </Button>
+          
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="text-red-600 border-red-200 hover:bg-red-50"
+              >
+                <Trash className="h-4 w-4 mr-1" />
+                Delete
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Confession</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this confession? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteAction}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
