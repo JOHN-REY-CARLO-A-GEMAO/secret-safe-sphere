@@ -22,7 +22,7 @@ export const StatsCard = ({ icon, title, value, isLoading = false }: StatsCardPr
           {isLoading ? (
             <Skeleton className="h-8 w-16" />
           ) : (
-            <p className="text-2xl font-bold">{value || '0'}</p>
+            <p className="text-2xl font-bold">{value !== null && value !== undefined ? value : '0'}</p>
           )}
         </div>
       </div>

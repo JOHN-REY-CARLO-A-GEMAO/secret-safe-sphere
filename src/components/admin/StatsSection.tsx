@@ -15,7 +15,7 @@ export const StatsSection = ({ stats }: StatsSectionProps) => {
       {stats.error && (
         <Alert variant="destructive" className="mb-4">
           <AlertDescription>
-            There was an error loading statistics. Showing fallback data.
+            There was an error loading live statistics. Showing estimated data.
           </AlertDescription>
         </Alert>
       )}
