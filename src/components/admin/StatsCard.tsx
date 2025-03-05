@@ -1,14 +1,16 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface StatsCardProps {
   icon: React.ReactNode;
   title: string;
-  value: string;
+  value: string | number;
+  isLoading?: boolean;
 }
 
-export const StatsCard = ({ icon, title, value }: StatsCardProps) => {
+export const StatsCard = ({ icon, title, value, isLoading = false }: StatsCardProps) => {
   return (
     <Card className="p-6">
       <div className="flex items-center">
@@ -17,7 +19,11 @@ export const StatsCard = ({ icon, title, value }: StatsCardProps) => {
         </div>
         <div>
           <h3 className="text-sm font-medium text-gray-500">{title}</h3>
-          <p className="text-2xl font-bold">{value}</p>
+          {isLoading ? (
+            <Skeleton className="h-8 w-16" />
+          ) : (
+            <p className="text-2xl font-bold">{value || '0'}</p>
+          )}
         </div>
       </div>
     </Card>

@@ -12,6 +12,7 @@ import { AdminLoadingState } from '@/components/admin/AdminLoadingState';
 const AdminDashboard = () => {
   const adminStats = useAdminStats();
 
+  // Only show loading state when initially loading
   if (adminStats.isLoading) {
     return <AdminLoadingState />;
   }
