@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import { Shield, Menu, X, LogIn, LayoutDashboard } from 'lucide-react';
 import { SlideIn } from './Animations';
 import { useAuth } from '@/contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from './ui/button';
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === '/';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,14 +69,16 @@ export const Navbar = () => {
               </div>
             </SlideIn>
           ) : (
-            <SlideIn delay={500}>
-              <Link to="/auth">
-                <Button>
-                  <LogIn className="w-4 h-4 mr-2" />
-                  Sign in
-                </Button>
-              </Link>
-            </SlideIn>
+            !isHomePage && (
+              <SlideIn delay={500}>
+                <Link to="/auth">
+                  <Button>
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Sign in
+                  </Button>
+                </Link>
+              </SlideIn>
+            )
           )}
         </nav>
 
@@ -121,12 +125,14 @@ export const Navbar = () => {
                   </Button>
                 </div>
               ) : (
-                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
-                  <Button className="w-full">
-                    <LogIn className="w-4 h-4 mr-2" />
-                    Sign in
-                  </Button>
-                </Link>
+                !isHomePage && (
+                  <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full">
+                      <LogIn className="w-4 h-4 mr-2" />
+                      Sign in
+                    </Button>
+                  </Link>
+                )
               )}
             </nav>
           </div>
