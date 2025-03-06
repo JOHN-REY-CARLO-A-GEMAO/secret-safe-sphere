@@ -35,8 +35,8 @@ const Auth = () => {
     }
   };
 
-  // If already loading auth state, show nothing
-  if (authState.isLoading) {
+  // Only show loading if we are actively checking auth state and not if we're on initial load
+  if (authState.isLoading && authState.user !== null) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
@@ -47,11 +47,7 @@ const Auth = () => {
     );
   }
 
-  // If already authenticated, don't show login form
-  if (authState.user) {
-    return null;
-  }
-
+  // Show login form by default, even if auth state is still loading initially
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
