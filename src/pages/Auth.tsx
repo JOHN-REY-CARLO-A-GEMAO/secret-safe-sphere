@@ -1,15 +1,30 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Shield } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { signIn, signUp } = useAuth();
+  const { authState, signIn, signUp } = useAuth();
+  const navigate = useNavigate();
+  
+  // Redirect if user is already logged in
+  useEffect(() => {
+    if (authState.user && !authState.isLoading) {
+      // If user is admin, redirect to admin dashboard
+      if (authState.profile?.role === 'admin') {
+        navigate('/admin');
+      } else {
+        // Regular users go to homepage
+        navigate('/');
+      }
+    }
+  }, [authState.user, authState.profile, authState.isLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +34,23 @@ const Auth = () => {
       await signIn(email, password);
     }
   };
+
+  // If already loading auth state, show nothing
+  if (authState.isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <Shield className="mx-auto h-12 w-12 text-primary animate-pulse" />
+          <p className="mt-4 text-gray-500">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If already authenticated, don't show login form
+  if (authState.user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
