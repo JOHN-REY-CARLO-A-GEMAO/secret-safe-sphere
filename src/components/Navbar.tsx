@@ -23,6 +23,7 @@ export const Navbar = () => {
 
   const { authState, signOut } = useAuth();
   const { user, profile } = authState;
+  const isAdmin = profile?.role === 'admin';
 
   return (
     <header
@@ -38,7 +39,7 @@ export const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          {['About', 'Privacy', 'Guidelines', 'Support'].map((item, index) => (
+          {!isAdmin && !isHomePage && ['About', 'Privacy', 'Guidelines', 'Support'].map((item, index) => (
             <SlideIn key={item} delay={100 + index * 100}>
               <a
                 href="#"
@@ -53,7 +54,7 @@ export const Navbar = () => {
             !isHomePage && (
               <SlideIn delay={500}>
                 <div className="flex items-center space-x-4">
-                  {profile?.role === 'admin' && (
+                  {isAdmin && (
                     <>
                       <span className="text-sm font-medium text-primary">Admin</span>
                       <Link to="/admin">
@@ -96,7 +97,7 @@ export const Navbar = () => {
         {isMenuOpen && (
           <div className="absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md shadow-md p-5 md:hidden animate-fadeIn">
             <nav className="flex flex-col space-y-4">
-              {['About', 'Privacy', 'Guidelines', 'Support'].map((item) => (
+              {!isAdmin && !isHomePage && ['About', 'Privacy', 'Guidelines', 'Support'].map((item) => (
                 <a
                   key={item}
                   href="#"
@@ -110,7 +111,7 @@ export const Navbar = () => {
               {user ? (
                 !isHomePage && (
                   <div className="pt-2 border-t border-gray-100">
-                    {profile?.role === 'admin' && (
+                    {isAdmin && (
                       <>
                         <span className="block text-sm font-medium text-primary mb-2">
                           Admin
