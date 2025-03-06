@@ -50,24 +50,26 @@ export const Navbar = () => {
           ))}
           
           {user ? (
-            <SlideIn delay={500}>
-              <div className="flex items-center space-x-4">
-                {profile?.role === 'admin' && (
-                  <>
-                    <span className="text-sm font-medium text-primary">Admin</span>
-                    <Link to="/admin">
-                      <Button variant="outline" size="sm">
-                        <LayoutDashboard className="w-4 h-4 mr-2" />
-                        Dashboard
-                      </Button>
-                    </Link>
-                  </>
-                )}
-                <Button variant="outline" onClick={signOut}>
-                  Sign out
-                </Button>
-              </div>
-            </SlideIn>
+            !isHomePage && (
+              <SlideIn delay={500}>
+                <div className="flex items-center space-x-4">
+                  {profile?.role === 'admin' && (
+                    <>
+                      <span className="text-sm font-medium text-primary">Admin</span>
+                      <Link to="/admin">
+                        <Button variant="outline" size="sm">
+                          <LayoutDashboard className="w-4 h-4 mr-2" />
+                          Dashboard
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                  <Button variant="outline" onClick={signOut}>
+                    Sign out
+                  </Button>
+                </div>
+              </SlideIn>
+            )
           ) : (
             !isHomePage && (
               <SlideIn delay={500}>
@@ -106,24 +108,26 @@ export const Navbar = () => {
               ))}
               
               {user ? (
-                <div className="pt-2 border-t border-gray-100">
-                  {profile?.role === 'admin' && (
-                    <>
-                      <span className="block text-sm font-medium text-primary mb-2">
-                        Admin
-                      </span>
-                      <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
-                        <Button variant="outline" className="w-full mb-2">
-                          <LayoutDashboard className="w-4 h-4 mr-2" />
-                          Dashboard
-                        </Button>
-                      </Link>
-                    </>
-                  )}
-                  <Button variant="outline" onClick={signOut} className="w-full">
-                    Sign out
-                  </Button>
-                </div>
+                !isHomePage && (
+                  <div className="pt-2 border-t border-gray-100">
+                    {profile?.role === 'admin' && (
+                      <>
+                        <span className="block text-sm font-medium text-primary mb-2">
+                          Admin
+                        </span>
+                        <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                          <Button variant="outline" className="w-full mb-2">
+                            <LayoutDashboard className="w-4 h-4 mr-2" />
+                            Dashboard
+                          </Button>
+                        </Link>
+                      </>
+                    )}
+                    <Button variant="outline" onClick={signOut} className="w-full">
+                      Sign out
+                    </Button>
+                  </div>
+                )
               ) : (
                 !isHomePage && (
                   <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
